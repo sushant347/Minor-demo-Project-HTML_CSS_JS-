@@ -911,11 +911,32 @@
 
     function slide(categoryId, direction) {
       const container = document.getElementById('slider-' + categoryId);
-      const scrollAmount = container.offsetWidth; 
-      container.scrollBy({
-        left: direction * scrollAmount,
-        behavior: 'smooth'
-      });
+      const scrollAmount = container.offsetWidth;
+      const maxScrollLeft = container.scrollWidth - container.clientWidth;
+      
+      // Check if we're at the end and trying to go right
+      if (direction === 1 && container.scrollLeft >= maxScrollLeft - 5) {
+        // Loop back to the beginning
+        container.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+      // Check if we're at the beginning and trying to go left
+      else if (direction === -1 && container.scrollLeft <= 5) {
+        // Loop to the end
+        container.scrollTo({
+          left: maxScrollLeft,
+          behavior: 'smooth'
+        });
+      }
+      // Normal scroll
+      else {
+        container.scrollBy({
+          left: direction * scrollAmount,
+          behavior: 'smooth'
+        });
+      }
     }
 
     // Product data with descriptions
