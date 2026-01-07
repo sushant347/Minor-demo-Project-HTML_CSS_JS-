@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UrbanWave</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Modal Styles */
+    .product-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      animation: fadeIn 0.3s ease;
+      overflow-y: auto;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .product-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Modal-scoped toast (appears inside the product modal) */
+    .modal-toast {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      display: none;
+      z-index: 10002;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Page-level toast (full-width bottom bar) */
+    .toast-notification {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      display: none;
+      z-index: 10000;
+      animation: slideUp 0.5s, fadeOut 0.5s 3.5s forwards;
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: 600;
+    }
+
+    .modal-content {
+      background-color: #fffaf0;
+      width: 90%;
+      max-width: 1100px;
+      border-radius: 15px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      animation: slideUp 0.3s ease;
+      position: relative;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      color: #a67c52;
+      cursor: pointer;
+      z-index: 10;
+      background: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .modal-close-btn:hover {
+      transform: rotate(90deg);
+      background-color: #a67c52;
+      color: white;
+    }
+
+    .modal-left {
+      flex: 1;
+      background: linear-gradient(135deg, #d4c4a8 0%, #e6dbc8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      min-height: 500px;
+    }
+
+    .modal-product-image {
+      max-width: 100%;
+      max-height: 450px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      animation: zoomIn 0.4s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-right {
+      flex: 1;
+      padding: 50px 40px;
+      overflow-y: auto;
+      background-color: #fffaf0;
+      max-height: 90vh;
+    }
+
+    .modal-right::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-right::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .modal-right::-webkit-scrollbar-thumb {
+      background: #a67c52;
+      border-radius: 4px;
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .modal-price {
+      font-size: 2.2rem;
+      color: #3e8741;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .original-price {
+      color: #999;
+      text-decoration: line-through;
+      font-size: 1.3rem;
+      margin-left: 10px;
+    }
+
+    .discount-badge {
+      display: inline-block;
+      background-color: #cc4b4b;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-left: 10px;
+      font-weight: 600;
+    }
+
+    .rating {
+      margin: 20px 0;
+      color: #f5a623;
+      font-size: 1.1rem;
+    }
+
+    .rating-text {
+      color: #666;
+      margin-left: 10px;
+      font-size: 0.95rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, #e1d8c3, transparent);
+      margin: 25px 0;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 25px 0 12px 0;
+      color: #a67c52;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .description {
+      line-height: 1.8;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .size-options, .color-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .size-btn, .color-btn {
+      padding: 12px 22px;
+      border: 2px solid #e1d8c3;
+      background-color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .size-btn:hover, .color-btn:hover {
+      border-color: #a67c52;
+      background-color: #f5f2eb;
+      transform: translateY(-2px);
+    }
+
+    .size-btn.selected, .color-btn.selected {
+      background-color: #a67c52;
+      color: white;
+      border-color: #a67c52;
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .features-list li {
+      padding: 10px 0;
+      padding-left: 30px;
+      position: relative;
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .features-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #3e8741;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .qty-btn {
+      width: 45px;
+      height: 45px;
+      border: 2px solid #a67c52;
+      background-color: white;
+      color: #a67c52;
+      font-size: 1.4rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .qty-btn:hover {
+      background-color: #a67c52;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .qty-display {
+      font-size: 1.3rem;
+      font-weight: bold;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .add-cart-btn, .buy-now-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .add-cart-btn {
+      background-color: #a67c52;
+      color: white;
+    }
+
+    .add-cart-btn:hover {
+      background-color: #8b623a;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(166, 124, 82, 0.4);
+    }
+
+    .buy-now-btn {
+      background-color: #3e8741;
+      color: white;
+    }
+
+    .buy-now-btn:hover {
+      background-color: #2d6630;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(62, 135, 65, 0.4);
+    }
+
+    .stock-status {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin: 15px 0;
+      font-weight: 600;
+    }
+
+    .in-stock {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    /* Improved Search Bar & Suggestions */
+    .search-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    #search-toggle {
+      background: none;
+      border: none;
+      font-size: 32px;
+      cursor: pointer;
+      padding: 5px;
+      z-index: 11;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      order: 2; /* Icon on the right */
+    }
+
+    .search-container.active #search-toggle {
+      transform: translateX(5px); /* Slight slide to the right */
+    }
+
+    #search-form {
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+      display: flex;
+      align-items: center;
+      z-index: 10;
+      order: 1; /* Input on the left */
+      position: relative;
+      height: 40px;
+    }
+
+    .search-container.active #search-form {
+      width: 300px;
+      opacity: 1;
+      margin-right: 10px;
+      overflow: visible; /* Allow suggestions to show */
+    }
+
+    #search-input {
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      padding: 0 15px !important; /* Override style.css padding */
+      border: 2px solid #a67c52;
+      border-radius: 30px;
+      outline: none;
+      font-size: 1rem;
+      background: white !important;
+      color: #000000 !important; /* Force black text */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: block;
+      opacity: 1 !important; /* Override style.css opacity */
+      width: 100% !important; /* Override style.css width */
+      transition: all 0.3s ease;
+    }
+
+    #search-input:focus {
+      border-color: #8b623a;
+      box-shadow: 0 0 8px rgba(166, 124, 82, 0.3);
+    }
+
+    .suggestions-box {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 100%;
+      background: white !important;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 1000;
+      border: 1px solid #e1d8c3;
+      overflow: hidden; /* Ensures content stays inside rounded corners */
+      animation: slideDown 0.2s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .suggestions-box.active {
+      display: block;
+    }
+
+    .suggestion-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      max-width: 100%;
+      width: 100%;
+      transition: background 0.2s;
+      color: #000000 !important;
+      text-decoration: none;
+      border-bottom: 1px solid #f5f2eb;
+      overflow: hidden; /* Ensures content stays within the item bounds */
+      box-sizing: border-box;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+      background-color: #f5f2eb;
+    }
+
+    .suggestion-item i {
+        color: #a67c52;
+        width: 24px;
+        font-size: 1.2rem;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .suggestion-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+
+    .suggestion-item span {
+      font-weight: 600;
+      font-size: 1.4rem !important;
+      color: #000000 !important;
+      display: inline-block;
+      white-space: nowrap;
+      overflow: visible;
+      flex: 1;
+      text-align: left;
+    }
+
+    /* Add to Cart Animation Styles */
+    .falling-cloth {
+      position: absolute;
+      top: -45px;
+      left: 28px;
+      font-size: 20px;
+      color: #fff;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      animation: fallIntoBasket 0.8s ease-in-out forwards;
+    }
+
+    @keyframes fallIntoBasket {
+      0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(60px) rotate(360deg) scale(0.3); }
+    }
+
+    .animating .fa-shopping-cart {
+      animation: shakeBasket 0.4s ease-in-out 0.4s;
+    }
+
+    @keyframes shakeBasket {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Make product cards clickable */
+    .product-card {
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        flex-direction: column;
+        width: 95%;
+        max-width: 100%;
+      }
+
+      .modal-left {
+        min-height: 300px;
+      }
+
+      .modal-product-image {
+        max-height: 300px;
+      }
+
+      .modal-right {
+        padding: 30px 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+      }
+
+      .modal-price {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast-notification" class="toast-notification"></div>
+
+  <!-- Sale Banner -->
+  <div class="scroll-header">
+    <div class="scroll-text">🔥 Summer Sale On All Categories — Up to 50% Off! 🔥</div>
+  </div>
+<nav class="navbar">
+  <!-- Logo -->
+  <div class="logo-container">
+    <a href="index.html">
+      <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/ufo-logo.png" alt="UFO Logo" class="logo"/>
+    </a>
+  </div>
+
+  <!-- Navigation Links -->
+  <div class="nav-links">
+    <a href="clothes.html" class="active">Clothes</a>
+    <a href="footwear.html">Footwear</a>
+    <a href="accessories.html">Accessories</a>
+    <a href="bags.html">Bags</a>
+  </div>
+
+  <!-- Icons -->
+  <div class="nav-icons">
+    <a class="nav-link" href="cart.html">🛒</a>
+    <a class="nav-link" href="wishlist.html">❤️</a>
+
+    <!-- Search -->
+    <div class="search-container" id="search-container">
+      <form id="search-form" onsubmit="handleSearch(event)" role="search">
+        <input id="search-input" type="text" placeholder="Search products..." autocomplete="off" />
+        <div id="suggestions-box" class="suggestions-box"></div>
+      </form>
+      <button type="button" id="search-toggle">🔍</button>
+    </div>
+
+    <!-- Sign In -->
+    <div class="signin-container">
+      <button type="button" id="signin-toggle"><i class="fas fa-envelope"></i></button>
+      <div class="signin-box" id="signin-dropdown">
+        <h3>Sign In</h3>
+        <form onsubmit="event.preventDefault(); alert('Sign in logic goes here!');">
+          <div class="input-group">
+            <input type="email" id="signin-email" required placeholder=" ">
+            <label for="signin-email">Email Address</label>
+          </div>
+          <div class="input-group">
+            <input type="password" id="signin-password" required placeholder=" ">
+            <label for="signin-password">Password</label>
+          </div>
+          <button type="submit" class="signin-btn">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</nav>
+  <!-- Hero Section -->
+<section class="hero">
+  <header>
+    <div class="left">
+      <h1> UrbanWave,
+        Transforming Dreams into Fashion</h1>
+      <p class="sub-heading">
+        With our expertise and passion for innovation, we bring your dreams to the fashion world.
+      </p>
+      <div class="buttons">
+        <a href="shop.html" class="btn active">Shop</a>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="bg-color"></div>
+      <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/pic.png" alt="Model 1">
+      <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/mod2.png" alt="Model 2">
+    </div>
+  </header>
+</section>
+
+  <section class="category-slider-section">
+    <!-- Festive Category -->
+    <div class="category-block">
+      <h3>Festives</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Festives', -1)">‹</button>
+        <div class="slider-container" id="slider-Festives">
+          <div class="product-card" onclick="openProductModal('Festive Top 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/Fest1.jpeg', 1499, 1999, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/Fest1.jpeg" alt=""><h4>Top 1</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest2.jpeg', 1599, 2099, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest2.jpeg" alt=""><h4>Top 2</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest3.jpeg', 1699, 2199, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest3.jpeg" alt=""><h4>Top 3</h4><p>₹ 1,699</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest4.jpeg', 1799, 2299, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest4.jpeg" alt=""><h4>Top 4</h4><p>₹ 1,799</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest5.jpeg', 1899, 2399, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest5.jpeg" alt=""><h4>Top 5</h4><p>₹ 1,899</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest6.jpeg', 1999, 2499, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest6.jpeg" alt=""><h4>Top 6</h4><p>₹ 1,999</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest7.jpeg', 2099, 2599, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest7.jpeg" alt=""><h4>Top 7</h4><p>₹ 2,099</p></div>
+          <div class="product-card" onclick="openProductModal('Festive Top 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest8.jpeg', 2199, 2699, 'festive')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest8.jpeg" alt=""><h4>Top 8</h4><p>₹ 2,199</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Festives', 1)">›</button>
+      </div>
+    </div>
+
+    <!-- Formals Category -->
+    <div class="category-block">
+      <h3>Formals</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Formals', -1)">‹</button>
+        <div class="slider-container" id="slider-Formals">
+          <div class="product-card" onclick="openProductModal('Formal Shirt 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form1.jpg', 1699, 2199, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form1.jpg" alt=""><h4>Shirt 1</h4><p>₹ 1,699</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form2.jpg', 1799, 2299, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form2.jpg" alt=""><h4>Shirt 2</h4><p>₹ 1,799</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form3.jpg', 1899, 2399, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form3.jpg" alt=""><h4>Shirt 3</h4><p>₹ 1,899</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form4.jpg', 1999, 2499, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form4.jpg" alt=""><h4>Shirt 4</h4><p>₹ 1,999</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form5.jpg', 2099, 2599, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form5.jpg" alt=""><h4>Shirt 5</h4><p>₹ 2,099</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form6.jpg', 2199, 2699, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form6.jpg" alt=""><h4>Shirt 6</h4><p>₹ 2,199</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form7.jpg', 2299, 2799, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form7.jpg" alt=""><h4>Shirt 7</h4><p>₹ 2,299</p></div>
+          <div class="product-card" onclick="openProductModal('Formal Shirt 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form8.jpg', 2399, 2899, 'formal')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/form8.jpg" alt=""><h4>Shirt 8</h4><p>₹ 2,399</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Formals', 1)">›</button>
+      </div>
+    </div>
+
+    <!-- Dress Category -->
+    <div class="category-block">
+      <h3>Dresses</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Dresses', -1)">‹</button>
+        <div class="slider-container" id="slider-Dresses">
+          <div class="product-card" onclick="openProductModal('Dress Set 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre1.jpg', 999, 1499, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre1.jpg" alt=""><h4>Set 1</h4><p>₹ 999</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre2.jpg', 1099, 1599, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre2.jpg" alt=""><h4>Set 2</h4><p>₹ 1,099</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre3.jpg', 1199, 1699, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre3.jpg" alt=""><h4>Set 3</h4><p>₹ 1,199</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre4.jpg', 1299, 1799, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre4.jpg" alt=""><h4>Set 4</h4><p>₹ 1,299</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre5.jpg', 1399, 1899, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre5.jpg" alt=""><h4>Set 5</h4><p>₹ 1,399</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre6.jpg', 1499, 1999, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre6.jpg" alt=""><h4>Set 6</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre9.jpg', 1599, 2099, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre9.jpg" alt=""><h4>Set 7</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Dress Set 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre12.jpg', 1699, 2199, 'dress')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre12.jpg" alt=""><h4>Set 8</h4><p>₹ 1,699</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Dresses', 1)">›</button>
+      </div>
+    </div>
+    <!--Casuals Category-->
+    <div class="category-block">
+      <h3>Casuals </h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Casuals', -1)">‹</button>
+        <div class="slider-container" id="slider-Casuals">
+          <div class="product-card" onclick="openProductModal('Casual Set 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas1.jpg', 999, 1499, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas1.jpg" alt=""><h4>Set 1</h4><p>₹ 999</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas2.jpg', 1099, 1599, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas2.jpg" alt=""><h4>Set 2</h4><p>₹ 1,099</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas3.jpg', 1199, 1699, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas3.jpg" alt=""><h4>Set 3</h4><p>₹ 1,199</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas3.jpg', 1299, 1799, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas4.jpg" alt=""><h4>Set 3</h4><p>₹ 1,199</p></div>
+           <div class="product-card" onclick="openProductModal('Casual Set 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas4.jpg', 1399, 1899, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas4.jpg" alt=""><h4>Set 5</h4><p>₹ 1,399</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas5.jpg', 1499, 1999, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas5.jpg" alt=""><h4>Set 6</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas7.jpg', 1599, 2099, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas7.jpg" alt=""><h4>Set 7</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Casual Set 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas9.jpg', 1699, 2199, 'casual')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas9.jpg" alt=""><h4>Set 8</h4><p>₹ 1,699</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Casuals', 1)">›</button>
+      </div>
+    </div>
+    <!-- Bags Category-->
+    <div class="category-block">
+      <h3>Bags</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Bags', -1)">‹</button>
+        <div class="slider-container" id="slider-Bags">
+          <div class="product-card" onclick="openProductModal('Designer Bag 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag1.jpg', 999, 1499, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag1.jpg" alt=""><h4>Set 1</h4><p>₹ 999</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag2.jpg', 1099, 1599, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag2.jpg" alt=""><h4>Set 2</h4><p>₹ 1,099</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag3.jpg', 1199, 1699, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag3.jpg" alt=""><h4>Set 3</h4><p>₹ 1,199</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag5.jpg', 1299, 1799, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag5.jpg" alt=""><h4>Set 4</h4><p>₹ 1,299</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag6.jpg', 1399, 1899, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag6.jpg" alt=""><h4>Set 5</h4><p>₹ 1,399</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag9.jpg', 1499, 1999, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag9.jpg" alt=""><h4>Set 6</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag10.jpg', 1599, 2099, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag10.jpg" alt=""><h4>Set 7</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Designer Bag 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag12.jpg', 1699, 2199, 'bag')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag12.jpg" alt=""><h4>Set 8</h4><p>₹ 1,699</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Bags', 1)">›</button>
+      </div>
+    </div>
+<!-- Footwears Category-->
+    <div class="category-block">
+      <h3>Footwears</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Footwears', -1)">‹</button>
+        <div class="slider-container" id="slider-Footwears">
+          <div class="product-card" onclick="openProductModal('Footwear 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot1.jpeg', 999, 1499, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot1.jpeg" alt=""><h4>Set 1</h4><p>₹ 999</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/Foot2.jpeg', 1099, 1599, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/Foot2.jpeg" alt=""><h4>Set 2</h4><p>₹ 1,099</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot7.jpeg', 1199, 1699, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot7.jpeg" alt=""><h4>Set 3</h4><p>₹ 1,199</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot3.jpeg', 1299, 1799, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot3.jpeg" alt=""><h4>Set 4</h4><p>₹ 1,299</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot5.jpeg', 1399, 1899, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot5.jpeg" alt=""><h4>Set 5</h4><p>₹ 1,399</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot6.jpeg', 1499, 1999, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot6.jpeg" alt=""><h4>Set 6</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot4.jpeg', 1599, 2099, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot4.jpeg" alt=""><h4>Set 7</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Footwear 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot8.jpeg', 1699, 2199, 'footwear')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot8.jpeg" alt=""><h4>Set 8</h4><p>₹ 1,699</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Footwears', 1)">›</button>
+      </div>
+    </div>
+    <!-- Accessories Category-->
+    <div class="category-block">
+      <h3>Accessories</h3>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" onclick="slide('Accessories', -1)">‹</button>
+        <div class="slider-container" id="slider-Accessories">
+          <div class="product-card" onclick="openProductModal('Accessory 1', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc 5.jpeg', 999, 1499, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc 5.jpeg" alt=""><h4>Set 1</h4><p>₹ 999</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 2', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc 6.jpeg', 1099, 1599, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc 6.jpeg" alt=""><h4>Set 2</h4><p>₹ 1,099</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 3', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc3.jpg', 1099, 1599, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc3.jpg"alt=""><h4>Set 3</h4><p>₹ 1,099</p></div> 
+          <div class="product-card" onclick="openProductModal('Accessory 4', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc2.jpeg', 1299, 1799, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc2.jpeg" alt=""><h4>Set 4</h4><p>₹ 1,299</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 5', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc5.jpeg', 1399, 1899, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc5.jpeg" alt=""><h4>Set 5</h4><p>₹ 1,399</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 6', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc6.jpeg', 1499, 1999, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc6.jpeg" alt=""><h4>Set 6</h4><p>₹ 1,499</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 7', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc1.jpg', 1599, 2099, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc1.jpg" alt=""><h4>Set 7</h4><p>₹ 1,599</p></div>
+          <div class="product-card" onclick="openProductModal('Accessory 8', 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc4.jpeg', 1699, 2199, 'accessory')"><img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc4.jpeg" alt=""><h4>Set 8</h4><p>₹ 1,699</p></div>
+        </div>
+        <button class="slider-btn next" onclick="slide('Accessories', 1)">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Detail Modal -->
+  <div id="productModal" class="product-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeProductModal()">&times;</button>
+      <div class="modal-left">
+        <img id="modalImage" class="modal-product-image" src="" alt="Product Image">
+      </div>
+      <div class="modal-right">
+        <h1 class="modal-title" id="modalTitle">Product Name</h1>
+        
+        <div class="rating">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star-half-alt"></i>
+          <span class="rating-text">4.5 (234 reviews)</span>
+        </div>
+
+        <div>
+          <span class="modal-price" id="modalPrice">₹ 2,499</span>
+          <span class="original-price" id="modalOriginalPrice">₹ 2,999</span>
+          <span class="discount-badge" id="modalDiscount">17% OFF</span>
+        </div>
+
+        <div class="stock-status in-stock">
+          <i class="fas fa-check-circle"></i> In Stock
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title">Description</div>
+        <p class="description" id="modalDescription">
+          Experience premium quality and exceptional style with this carefully crafted product. Made from high-quality materials with attention to every detail, ensuring durability and comfort for everyday wear.
+        </p>
+
+        <div class="section-title">Select Size</div>
+        <div class="size-options" id="sizeOptions">
+          <button class="size-btn" onclick="selectSize(this)">S</button>
+          <button class="size-btn selected" onclick="selectSize(this)">M</button>
+          <button class="size-btn" onclick="selectSize(this)">L</button>
+          <button class="size-btn" onclick="selectSize(this)">XL</button>
+          <button class="size-btn" onclick="selectSize(this)">XXL</button>
+        </div>
+
+        <div class="section-title">Available Colors</div>
+        <div class="color-options" id="colorOptions">
+          <button class="color-btn selected" onclick="selectColor(this)">Black</button>
+          <button class="color-btn" onclick="selectColor(this)">White</button>
+          <button class="color-btn" onclick="selectColor(this)">Blue</button>
+          <button class="color-btn" onclick="selectColor(this)">Red</button>
+        </div>
+
+        <div class="section-title">Key Features</div>
+        <ul class="features-list" id="featuresList">
+          <li>Premium quality materials</li>
+          <li>Comfortable all-day wear</li>
+          <li>Durable construction</li>
+          <li>Easy to maintain</li>
+          <li>Stylish design</li>
+          <li>Perfect for any occasion</li>
+        </ul>
+
+        <div class="section-title">Quantity</div>
+        <div class="quantity-selector">
+          <button class="qty-btn" onclick="decreaseQty()">−</button>
+          <span class="qty-display" id="qtyDisplay">1</span>
+          <button class="qty-btn" onclick="increaseQty()">+</button>
+        </div>
+
+        <div class="action-buttons">
+          <button class="add-cart-btn" onclick="addToCart(event)">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
+          </button>
+          <button class="buy-now-btn" onclick="buyNow()">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+        <div id="modal-toast" class="modal-toast"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Box Design and Active Links -->
+<footer>
+  <div class="footer-container">
+    <a href="index.html" class="footer-box">
+      <h3>Home</h3>
+      <p>Go to Homepage</p>
+    </a>
+    <a href="about.html" class="footer-box">
+      <h3>About Us</h3>
+      <p>Learn more about us</p>
+    </a>
+    <a href="info.html" class="footer-box">
+      <h3>Info</h3>
+      <p>Get important info</p>
+    </a>
+    <a href="Contact Final.html" class="footer-box">
+      <h3>Contact</h3>
+      <p>Reach out to us</p>
+    </a>
+    <a href="reviews.html" class="footer-box">
+      <h3>Customer Review</h3>
+      <p>Read customer reviews</p>
+    </a>
+  </div>
+  <p class="footer-credit">© 2025 UFO Clothing. All rights reserved.</p>
+</footer>
+
+ <script src="script.js"></script>
+ <script>
+    let quantity = 1;
+
+    function slide(categoryId, direction) {
+      const container = document.getElementById('slider-' + categoryId);
+      const scrollAmount = container.offsetWidth; 
+      container.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+
+    // Product data with descriptions
+    const productData = {
+      festive: {
+        description: 'Celebrate in style with our stunning festive collection. These pieces feature intricate designs, premium fabrics, and vibrant colors perfect for special occasions and celebrations. Crafted with attention to detail for a luxurious feel.',
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        colors: ['Red', 'Gold', 'Maroon', 'Pink'],
+        features: [
+          'Premium festive fabric',
+          'Intricate embroidery work',
+          'Comfortable fit',
+          'Perfect for celebrations',
+          'Easy to maintain',
+          'Traditional yet modern design'
+        ]
+      },
+      formal: {
+        description: 'Look sharp and professional with our formal collection. Made from high-quality cotton blend with wrinkle-resistant finish, these shirts offer the perfect combination of comfort and style for your workplace and formal events.',
+        sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL'],
+        colors: ['White', 'Blue', 'Black', 'Grey'],
+        features: [
+          'Premium cotton blend fabric',
+          'Wrinkle-resistant finish',
+          'Breathable and comfortable',
+          'Professional tailoring',
+          'Durable buttons',
+          'Perfect fit guarantee'
+        ]
+      },
+      dress: {
+        description: 'Express your unique style with our dress collection. These versatile pieces combine comfort with elegance, featuring modern cuts and premium materials. Perfect for both casual outings and semi-formal occasions.',
+        sizes: ['XS', 'S', 'M', 'L', 'XL'],
+        colors: ['Black', 'Navy', 'Beige', 'Burgundy'],
+        features: [
+          'Soft, breathable fabric',
+          'Flattering silhouette',
+          'Versatile styling options',
+          'Machine washable',
+          'Fade-resistant colors',
+          'Contemporary design'
+        ]
+      },
+      casual: {
+        description: 'Stay comfortable and stylish with our casual collection. Made from soft, breathable cotton, these pieces are perfect for everyday wear. The relaxed fit and durable construction make them your go-to choice for casual outings.',
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        colors: ['Black', 'White', 'Grey', 'Navy', 'Olive'],
+        features: [
+          '100% cotton comfort',
+          'Relaxed fit design',
+          'Durable construction',
+          'Pre-shrunk fabric',
+          'Versatile styling',
+          'Perfect for daily wear'
+        ]
+      },
+      bag: {
+        description: 'Carry your essentials in style with our designer bag collection. Crafted from premium materials with spacious compartments and reinforced stitching, these bags combine functionality with fashion for the modern lifestyle.',
+        sizes: ['Small', 'Medium', 'Large'],
+        colors: ['Black', 'Brown', 'Tan', 'Navy'],
+        features: [
+          'Premium quality materials',
+          'Multiple compartments',
+          'Reinforced stitching',
+          'Adjustable straps',
+          'Water-resistant exterior',
+          'Stylish and functional'
+        ]
+      },
+      footwear: {
+        description: 'Step into comfort with our footwear collection. Designed with cushioned insoles and slip-resistant soles, these shoes provide all-day comfort while maintaining a stylish appearance. Perfect for any occasion.',
+        sizes: ['6', '7', '8', '9', '10', '11', '12'],
+        colors: ['Black', 'White', 'Brown', 'Navy'],
+        features: [
+          'Cushioned insole',
+          'Slip-resistant sole',
+          'Breathable materials',
+          'Durable construction',
+          'Comfortable fit',
+          'Versatile design'
+        ]
+      },
+      accessory: {
+        description: 'Complete your look with our accessory collection. Each piece is carefully designed to add that perfect finishing touch to your outfit. Made from quality materials with attention to detail and style.',
+        sizes: ['One Size', 'Adjustable'],
+        colors: ['Silver', 'Gold', 'Black', 'Rose Gold'],
+        features: [
+          'Premium quality materials',
+          'Elegant design',
+          'Adjustable fit',
+          'Tarnish-resistant',
+          'Perfect gift option',
+          'Versatile styling'
+        ]
+      }
+    };
+
+    function openProductModal(name, imageSrc, price, originalPrice, category) {
+      const modal = document.getElementById('productModal');
+      const data = productData[category];
+
+      // Calculate discount
+      const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
+
+      // Update modal content
+      const modalImage = document.getElementById('modalImage');
+      modalImage.src = imageSrc;
+      document.getElementById('modalTitle').textContent = name;
+      document.getElementById('modalPrice').textContent = '₹ ' + price.toLocaleString();
+      document.getElementById('modalOriginalPrice').textContent = '₹ ' + originalPrice.toLocaleString();
+      document.getElementById('modalDiscount').textContent = discount + '% OFF';
+      document.getElementById('modalDescription').textContent = data.description;
+
+      // Update sizes
+      const sizeOptions = document.getElementById('sizeOptions');
+      sizeOptions.innerHTML = data.sizes.map((size, i) => 
+        `<button class="size-btn ${i === 1 ? 'selected' : ''}" onclick="selectSize(this)">${size}</button>`
+      ).join('');
+
+      // Update colors
+      const colorOptions = document.getElementById('colorOptions');
+      colorOptions.innerHTML = data.colors.map((color, i) => 
+        `<button class="color-btn ${i === 0 ? 'selected' : ''}" onclick="selectColor(this)">${color}</button>`
+      ).join('');
+
+      // Update features
+      const featuresList = document.getElementById('featuresList');
+      featuresList.innerHTML = data.features.map(feature => 
+        `<li>${feature}</li>`
+      ).join('');
+
+      // Reset quantity
+      quantity = 1;
+      document.getElementById('qtyDisplay').textContent = quantity;
+
+      // Make the modal active first so layout measurements are accurate
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Ensure the modal image visually covers ~80% of the modal-left area.
+      // We calculate an exact pixel height based on the .modal-left clientHeight
+      // and apply it to the image. This works for any category / image.
+      function setModalImageHeight() {
+        const modalLeft = document.querySelector('.modal-left');
+        if (!modalLeft) return;
+        // clientHeight includes padding and excludes scrollbar/border
+        const available = modalLeft.clientHeight;
+        const target = Math.max(120, Math.round(available * 0.8)); // minimum reasonable height
+        modalImage.style.height = target + 'px';
+        modalImage.style.maxHeight = 'none';
+        modalImage.style.objectFit = 'contain';
+        // center image visually
+        modalImage.style.display = 'block';
+      }
+
+      // initial sizing
+      setModalImageHeight();
+
+      // update sizing on window resize while modal is open
+      const resizeHandler = () => { if (modal.classList.contains('active')) setModalImageHeight(); };
+      window.addEventListener('resize', resizeHandler);
+
+      // store handler on modal element (so we can remove it on close)
+      modal._resizeHandler = resizeHandler;
+    }
+
+    function closeProductModal() {
+      const modal = document.getElementById('productModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    function selectSize(btn) {
+      const buttons = btn.parentElement.querySelectorAll('.size-btn');
+      buttons.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function selectColor(btn) {
+      const buttons = btn.parentElement.querySelectorAll('.color-btn');
+      buttons.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function increaseQty() {
+      if (quantity < 10) {
+        quantity++;
+        document.getElementById('qtyDisplay').textContent = quantity;
+      }
+    }
+
+    function decreaseQty() {
+      if (quantity > 1) {
+        quantity--;
+        document.getElementById('qtyDisplay').textContent = quantity;
+      }
+    }
+
+    function addToCart(event) {
+      if (event) {
+        event.stopImmediatePropagation();
+      }
+      const title = document.getElementById('modalTitle').textContent;
+      const priceText = document.getElementById('modalPrice').textContent;
+      const price = parseInt(priceText.replace(/[₹,\s]/g, ''));
+      const selectedSize = document.querySelector('.size-btn.selected')?.textContent || 'M';
+      const selectedColor = document.querySelector('.color-btn.selected')?.textContent || 'Black';
+      const imageSrc = document.getElementById('modalImage').src;
+
+      // Add falling cloth animation
+      const btn = event.currentTarget;
+      const clothIcon = document.createElement('i');
+      clothIcon.className = 'fas fa-tshirt falling-cloth';
+      btn.appendChild(clothIcon);
+      btn.classList.add('animating');
+      setTimeout(() => {
+        clothIcon.remove();
+        btn.classList.remove('animating');
+      }, 800);
+
+      // Get existing cart from localStorage
+      let cart = [];
+      const savedCart = localStorage.getItem('urbanwaveCart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+      }
+
+      // Check if item already exists in cart
+      const existingItemIndex = cart.findIndex(item => 
+        item.name === title && item.size === selectedSize && item.color === selectedColor
+      );
+
+      if (existingItemIndex > -1) {
+        // Update quantity if item exists
+        cart[existingItemIndex].quantity += quantity;
+        if (cart[existingItemIndex].quantity > 10) cart[existingItemIndex].quantity = 10;
+      } else {
+        // Add new item to cart
+        cart.push({
+          name: title,
+          price: price,
+          quantity: quantity,
+          size: selectedSize,
+          color: selectedColor,
+          image: imageSrc
+        });
+      }
+
+      // Save to localStorage
+      localStorage.setItem('urbanwaveCart', JSON.stringify(cart));
+
+      // Show success message inside modal (preferred) or page-level toast, fallback to alert
+      const modal = document.getElementById('productModal');
+      if (modal && modal.classList.contains('active')) {
+        const mtoast = document.getElementById('modal-toast');
+        if (mtoast) {
+          mtoast.innerHTML = `✓ ${quantity} x ${title} <a href="cart.html" style="margin-left:12px;padding:6px 10px;background:#fff;color:#4CAF50;border-radius:4px;text-decoration:none;font-weight:700;">View Cart</a>`;
+          mtoast.style.display = 'block';
+          // restart animation / ensure visible
+          void mtoast.offsetWidth;
+          setTimeout(() => { mtoast.style.display = 'none'; }, 3500);
+        } else {
+          alert(`✓ ${quantity} x ${title}\nSize: ${selectedSize}\nColor: ${selectedColor}\n\nAdded to cart successfully!`);
+        }
+      } else {
+        const toast = document.getElementById('toast-notification');
+        if (toast) {
+        toast.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <span>✓ ${quantity} x ${title} added to cart</span>
+            <a href="cart.html" style="background: white; color: #4CAF50; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">VIEW CART</a>
+          </div>
+        `;
+          toast.style.display = 'block';
+        toast.style.animation = 'none';
+        void toast.offsetWidth;
+        toast.style.animation = 'slideUp 0.5s, fadeOut 0.5s 3.5s forwards';
+        setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        } else {
+          alert(`✓ ${quantity} x ${title}\nSize: ${selectedSize}\nColor: ${selectedColor}\n\nAdded to cart successfully!`);
+        }
+      }
+
+      // Reset quantity
+      quantity = 1;
+      document.getElementById('qtyDisplay').textContent = quantity;
+    }
+
+    function buyNow() {
+      const title = document.getElementById('modalTitle').textContent;
+      const priceText = document.getElementById('modalPrice').textContent;
+      const price = parseInt(priceText.replace(/[₹,\s]/g, ''));
+      const selectedSize = document.querySelector('.size-btn.selected')?.textContent || 'M';
+      const selectedColor = document.querySelector('.color-btn.selected')?.textContent || 'Default';
+      const imageSrc = document.getElementById('modalImage').src;
+
+      let cart = JSON.parse(localStorage.getItem('urbanwaveCart') || '[]');
+      cart.push({
+        name: title,
+        price: price,
+        quantity: quantity,
+        size: selectedSize,
+        color: selectedColor,
+        image: imageSrc
+      });
+      localStorage.setItem('urbanwaveCart', JSON.stringify(cart));
+      window.location.href = 'cart.html?checkout=true&buyNow=true';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('productModal');
+      if (event.target === modal) {
+        closeProductModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('productModal');
+        if (modal.classList.contains('active')) {
+          closeProductModal();
+        }
+      }
+    });
+
+    // Sign-In Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const signinToggle = document.getElementById('signin-toggle');
+      const signinDropdown = document.getElementById('signin-dropdown');
+
+      signinToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        signinDropdown.classList.toggle('active');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (signinDropdown.classList.contains('active') && !signinDropdown.contains(e.target)) {
+          signinDropdown.classList.remove('active');
+        }
+      });
+    });
+
+    // Improved Search Functionality with Shopping Suggestions
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchToggle = document.getElementById('search-toggle');
+      const searchContainer = document.getElementById('search-container');
+      const searchInput = document.getElementById('search-input');
+      const suggestionsBox = document.getElementById('suggestions-box');
+
+      const searchablePages = [
+        { name: 'Clothes', url: 'clothes.html', icon: 'fa-shirt', image: 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/cas1.jpg', keywords: ['clothes', 'dress', 'top', 'shirt', 'casual'] },
+        { name: 'Footwear', url: 'footwear.html', icon: 'fa-shoe-prints', image: 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot1.jpeg', keywords: ['footwear', 'shoes', 'hills', 'boots', 'sandals', 'foot'] },
+        { name: 'Accessories', url: 'accessories.html', icon: 'fa-gem', image: 'https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc2.jpeg', keywords: ['accessories', 'watch', 'jewelry', 'belt'] },
+        { name: 'Bags', url: 'bags.html', icon: 'fa-bag-shopping', image: 'images/bag8.jpg', keywords: ['bags', 'handbag', 'tote', 'backpack'] }
+      ];
+
+      searchToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = searchContainer.classList.toggle('active');
+        if (isActive) {
+          searchInput.focus();
+        } else {
+          suggestionsBox.classList.remove('active');
+          searchInput.value = '';
+        }
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        if (query.length > 0) {
+          const filtered = searchablePages.filter(page => 
+            page.name.toLowerCase().includes(query) || 
+            page.keywords.some(k => k.includes(query))
+          );
+
+          if (filtered.length > 0) {
+            suggestionsBox.innerHTML = filtered.map(page => `
+              <div class="suggestion-item" onclick="window.location.href='${page.url}'">
+                <img src="${page.image}" alt="${page.name}">
+                <span>${page.name}</span>
+              </div>
+            `).join('');
+            suggestionsBox.classList.add('active');
+          } else {
+            suggestionsBox.classList.remove('active');
+          }
+        } else {
+          suggestionsBox.classList.remove('active');
+        }
+      });
+
+      // Prevent closing when clicking inside the input or suggestions
+      searchContainer.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener('click', (e) => {
+        searchContainer.classList.remove('active');
+        suggestionsBox.classList.remove('active');
+      });
+    });
+
+    function handleSearch(event) {
+      event.preventDefault();
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      const match = ['clothes', 'footwear', 'accessories', 'bags'].find(p => p.includes(query));
+      if (match) window.location.href = match + '.html';
+    }
+  </script>
+</body>
+</html>

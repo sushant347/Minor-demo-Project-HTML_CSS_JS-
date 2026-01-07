@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UrbanWave - Footwear & Accessories</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f2eb;
+      color: #333;
+    }
+
+    .toast-notification {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      display: none;
+      z-index: 1000;
+      animation: slideUp 0.5s, fadeOut 0.5s 3.5s forwards;
+      width: 100%;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Add to Cart Animation Styles */
+    .falling-cloth {
+      position: absolute;
+      top: -45px;
+      left: 28px;
+      font-size: 20px;
+      color: #fff;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      animation: fallIntoBasket 0.8s ease-in-out forwards;
+    }
+
+    @keyframes fallIntoBasket {
+      0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(60px) rotate(360deg) scale(0.3); }
+    }
+
+    .animating .fa-cart-plus {
+      animation: shakeBasket 0.4s ease-in-out 0.4s;
+    }
+
+    @keyframes shakeBasket {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    header {
+      background-color: #e6dbc8;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar {
+      display: flex;
+      gap: 50px;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      font-weight: normal;
+      font-size: 1rem;
+    }
+
+    .navbar a:hover {
+      color: #a67c52;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: #a67c52;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #e6dbc8 0%, #f5f2eb 100%);
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      color: #a67c52;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #666;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .product-card {
+      background-color: #fffaf0;
+      border: 1px solid #e1d8c3;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #d4c4a8 0%, #e6dbc8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: #a67c52;
+    }
+
+    /* Make placeholder images fill the product-image area */
+    .product-image img,
+    .product-image__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .wishlist {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.3rem;
+      color: #cc4b4b;
+      background: white;
+      padding: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease;
+    }
+
+    .wishlist:hover {
+      transform: scale(1.1);
+    }
+
+    .wishlist.fas {
+      color: #ff4d4d;
+      text-shadow: 0 0 15px rgba(255, 77, 77, 0.8);
+      transform: scale(1.2);
+    }
+
+    .product-details {
+      padding: 20px;
+    }
+
+    .product-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .price {
+      color: #3e8741;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .original-price {
+      color: #999;
+      text-decoration: line-through;
+      margin-left: 10px;
+      font-size: 1rem;
+    }
+
+    .category {
+      display: inline-block;
+      background-color: #a67c52;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .shop-btn, .pay-btn {
+      flex: 1;
+      background-color: #a67c52;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      position: relative;
+      overflow: visible;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .shop-btn:hover, .pay-btn:hover {
+      background-color: #8b623a;
+      transform: translateY(-2px);
+    }
+
+    .pay-btn {
+      background-color: #3e8741;
+    }
+
+    .pay-btn:hover {
+      background-color: #2d6630;
+    }
+
+    /* Payment Options Roll */
+    .payment-roll {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out;
+      background-color: #f9f6f0;
+      border-top: 2px solid #e1d8c3;
+      margin-top: 0;
+    }
+
+    .payment-roll.active {
+      max-height: 300px;
+      transition: max-height 0.5s ease-in;
+    }
+
+    .payment-options {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background-color: white;
+      border: 2px solid #e1d8c3;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .payment-option:hover {
+      border-color: #a67c52;
+      transform: translateX(5px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Wishlist toast styles (copied from footwear.html for consistent behaviour) */
+    .wishlist-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      background-color: #ff6b6b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      text-align: center;
+      display: none;
+      z-index: 1001;
+      animation: slideUpWishlist 0.3s ease-out;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    @keyframes slideUpWishlist {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+    .payment-logo {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f2eb;
+      border-radius: 8px;
+      font-size: 2rem;
+    }
+
+    .esewa-logo {
+      color: #60bb46;
+    }
+
+    .khalti-logo {
+      color: #5d2e8e;
+    }
+
+    .bank-logo {
+      color: #1e5a9e;
+    }
+
+    .payment-name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Navigation -->
+  <header>
+    <div class="navbar">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="clothes.html">Clothes</a>
+      <a href="footwear.html">Footwear</a>
+      <a href="accessories.html">Accessories</a>
+      <a href="bags.html">Bags</a>
+      <a href="wishlist.html">Wishlist</a>
+      <a href="cart.html">Cart</a>
+      <a href="about.html">About Us</a>
+      <a href="info.html">Info</a>
+      <a href="Contact Final.html">Contact</a>
+    </div>
+    <div class="logo">UrbanWave</div>
+  </header>
+
+  <!-- Toast container used by script.js when adding items to cart -->
+  <div id="toast-notification" class="toast-notification"></div>
+
+  <div class="hero">
+    <h1>Shop Smart. Shop Stylish. Shop Urban</h1>
+    <p>Step into style with our premium collection</p>
+  </div>
+
+  <section class="product-grid">
+    <!-- Product 1 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc 6.jpeg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Classic Leather Sneakers</div>
+        <div>
+          <span class="price">Rs. 2,499</span>
+          <span class="original-price">Rs. 2,999</span>
+        </div>
+        <span class="category">Footwear</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div><div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/bag2.jpg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Stylish bag</div>
+        <div>
+          <span class="price">Rs. 4,499</span>
+          <span class="original-price">Rs. 4,999</span>
+        </div>
+        <span class="category">Footwear</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/fest5.jpeg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Sports Running Shoes</div>
+        <div>
+          <span class="price">Rs. 3,299</span>
+          <span class="original-price">Rs. 3,999</span>
+        </div>
+        <span class="category">Footwear</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc2.jpeg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Designer Watch</div>
+        <div>
+          <span class="price">Rs. 4,999</span>
+          <span class="original-price">Rs. 6,499</span>
+        </div>
+        <span class="category">Accessory</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/foot7.jpeg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Hiking Boots</div>
+        <div>
+          <span class="price">Rs. 3,799</span>
+          <span class="original-price">Rs. 4,499</span>
+        </div>
+        <span class="category">Footwear</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 5 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/acc11.jpg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Premium Watch</div>
+        <div>
+          <span class="price">Rs. 1,899</span>
+          <span class="original-price">Rs. 2,499</span>
+        </div>
+        <span class="category">Accessory</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 6 -->
+    <div class="product-card">
+      <i class="far fa-heart wishlist" onclick="toggleWishlist(this)"></i>
+      <div class="product-image">
+        <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/dre11.jpg" alt="Product placeholder" class="product-image__img">
+      </div>
+      <div class="product-details">
+        <div class="product-name">Leather Belt</div>
+        <div>
+          <span class="price">Rs. 899</span>
+          <span class="original-price">Rs. 1,299</span>
+        </div>
+        <span class="category">Accessory</span>
+        <div class="actions">
+          <button class="shop-btn" onclick="addToCart(this)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="pay-btn" onclick="buyNow(this)">
+            <i class="fas fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Wishlist toast notification -->
+  <div id="wishlist-toast" class="wishlist-toast"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

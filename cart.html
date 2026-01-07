@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart - UrbanWave</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f2eb;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background-color: #e6dbc8;
+      padding: 20px 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #a67c52;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #a67c52;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    /* Cart Items */
+    .cart-items {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-cart i {
+      font-size: 5rem;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+
+    .empty-cart h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .empty-cart a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #a67c52;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .empty-cart a:hover {
+      background-color: #8b623a;
+      transform: translateY(-2px);
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      gap: 20px;
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #d4c4a8 0%, #e6dbc8 100%);
+    }
+
+    .item-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .item-meta {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .item-price {
+      font-size: 1.3rem;
+      color: #3e8741;
+      font-weight: bold;
+    }
+
+    .item-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #cc4b4b;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px;
+      transition: all 0.3s;
+    }
+
+    .remove-btn:hover {
+      color: #a83838;
+      transform: scale(1.1);
+    }
+
+    .clear-cart-btn {
+      background: none;
+      border: 1.5px solid #cc4b4b;
+      color: #cc4b4b;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .clear-cart-btn:hover {
+      background-color: #cc4b4b;
+      color: white;
+    }
+
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid #e1d8c3;
+      border-radius: 8px;
+      padding: 5px;
+    }
+
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #a67c52;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .qty-btn:hover {
+      background: #8b623a;
+    }
+
+    .qty-value {
+      min-width: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* Cart Summary */
+    .cart-summary {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .summary-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    .summary-row.total {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #333;
+      padding-top: 15px;
+      border-top: 2px solid #e1d8c3;
+      margin-top: 15px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #3e8741 0%, #2d6630 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(62, 135, 65, 0.4);
+    }
+
+    .checkout-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .continue-shopping {
+      width: 100%;
+      padding: 14px;
+      background: white;
+      color: #a67c52;
+      border: 2px solid #a67c52;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+
+    .continue-shopping:hover {
+      background: #a67c52;
+      color: white;
+    }
+
+    /* Payment Modal */
+    .payment-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .payment-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .payment-content {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .payment-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #f0f0f0;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #666;
+      transition: all 0.3s;
+    }
+
+    .payment-close:hover {
+      background: #a67c52;
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .payment-title {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .payment-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .payment-option {
+      border: 2px solid #e1d8c3;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .payment-option:hover {
+      border-color: #a67c52;
+      background: #f9f6f0;
+      transform: translateX(5px);
+    }
+
+    .payment-option.selected {
+      border-color: #3e8741;
+      background: #f0f8f1;
+      box-shadow: 0 3px 15px rgba(62, 135, 65, 0.2);
+    }
+
+    .payment-icon {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: white;
+      padding: 10px;
+    }
+
+    .payment-info {
+      flex: 1;
+    }
+
+    .payment-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .payment-desc {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .payment-confirm-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #3e8741 0%, #2d6630 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    .payment-confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(62, 135, 65, 0.4);
+    }
+
+    .payment-confirm-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      .cart-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .cart-summary {
+        position: relative;
+        top: 0;
+      }
+
+      .cart-item {
+        grid-template-columns: 100px 1fr;
+        gap: 15px;
+      }
+
+      .item-actions {
+        grid-column: 2;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .cart-item {
+        grid-template-columns: 1fr;
+      }
+
+      .item-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      .payment-content {
+        padding: 25px;
+      }
+
+      .payment-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <a href="index.html" class="logo">UrbanWave</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="clothes.html">Clothes</a>
+        <a href="footwear.html">Footwear</a>
+        <a href="accessories.html">Accessories</a>
+        <a href="bags.html">Bags</a>
+        <a href="wishlist.html">Wishlist</a>
+        <a href="cart.html">Cart</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1 class="page-title">Shopping Cart</h1>
+
+    <div class="cart-layout">
+      <!-- Cart Items -->
+      <div class="cart-items">
+        <div id="cartItemsContainer">
+          <!-- Cart items will be dynamically inserted here -->
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary">
+        <h2 class="summary-title">Order Summary</h2>
+        <div class="summary-row">
+          <span>Subtotal (<span id="itemCount">0</span> items)</span>
+          <span id="subtotal">₹ 0</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span id="shipping">₹ 100</span>
+        </div>
+        <div class="summary-row">
+          <span>Discount</span>
+          <span id="discount" style="color: #3e8741;">- ₹ 0</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="total">₹ 0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn" onclick="openPaymentModal()">
+          <i class="fas fa-lock"></i> Proceed to Payment
+        </button>
+        <a href="index.html" class="continue-shopping">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="payment-modal">
+    <div class="payment-content">
+      <button class="payment-close" onclick="closePaymentModal()">&times;</button>
+      <h2 class="payment-title">Choose Payment Method</h2>
+      <p class="payment-subtitle">Select your preferred payment option</p>
+
+      <div class="payment-options">
+        <!-- eSewa -->
+        <div class="payment-option" onclick="selectPayment('esewa', this)">
+          <img src="https://esewa.com.np/common/images/esewa-logo.png" alt="eSewa" class="payment-icon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%2360bb46%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22white%22 font-weight=%22bold%22%3EeSewa%3C/text%3E%3C/svg%3E'">
+          <div class="payment-info">
+            <div class="payment-name">eSewa</div>
+            <div class="payment-desc">Digital wallet payment</div>
+          </div>
+          <i class="fas fa-check-circle" style="color: #3e8741; font-size: 1.5rem; opacity: 0;"></i>
+        </div>
+
+        <!-- Khalti -->
+        <div class="payment-option" onclick="selectPayment('khalti', this)">
+          <img src="https://khalti.com/static/images/logo1.png" alt="Khalti" class="payment-icon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%235c2d91%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-size=%2218%22 text-anchor=%22middle%22 fill=%22white%22 font-weight=%22bold%22%3EKhalti%3C/text%3E%3C/svg%3E'">
+          <div class="payment-info">
+            <div class="payment-name">Khalti</div>
+            <div class="payment-desc">Quick & secure payment</div>
+          </div>
+          <i class="fas fa-check-circle" style="color: #3e8741; font-size: 1.5rem; opacity: 0;"></i>
+        </div>
+
+        <!-- Bank Transfer -->
+        <div class="payment-option" onclick="selectPayment('bank', this)">
+          <div class="payment-icon" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+            <i class="fas fa-university" style="font-size: 2.5rem; color: white;"></i>
+          </div>
+          <div class="payment-info">
+            <div class="payment-name">Bank Transfer</div>
+            <div class="payment-desc">Direct bank payment</div>
+          </div>
+          <i class="fas fa-check-circle" style="color: #3e8741; font-size: 1.5rem; opacity: 0;"></i>
+        </div>
+      </div>
+
+      <button class="payment-confirm-btn" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>
+        Confirm Payment
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    let selectedPaymentMethod = null;
+    let isBuyNow = false;
+
+    // Load cart from localStorage on page load
+    function loadCart() {
+      const savedCart = localStorage.getItem('urbanwaveCart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+      }
+      renderCart();
+      updateSummary();
+    }
+
+    // Save cart to localStorage
+    function saveCart() {
+      localStorage.setItem('urbanwaveCart', JSON.stringify(cart));
+    }
+
+    // Render cart items
+    function renderCart() {
+      const container = document.getElementById('cartItemsContainer');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Your cart is empty</h3>
+            <p>Add some items to get started!</p>
+            <a href="index.html">Start Shopping</a>
+          </div>
+        `;
+        document.getElementById('checkoutBtn').disabled = true;
+        return;
+      }
+
+      document.getElementById('checkoutBtn').disabled = false;
+      
+      let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">
+          <h3 style="font-size: 1.2rem; color: #333;">Your Items</h3>
+          <button class="clear-cart-btn" onclick="clearCart()">
+            <i class="fas fa-trash-sweep"></i> Clear All
+          </button>
+        </div>
+      `;
+
+      html += cart.map((item, index) => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}" class="item-image">
+          <div class="item-details">
+            <div class="item-name">${item.name}</div>
+            <div class="item-meta">Size: ${item.size} | Color: ${item.color}</div>
+            <div class="item-price">₹ ${(item.price * item.quantity).toLocaleString()}</div>
+          </div>
+          <div class="item-actions">
+            <button class="remove-btn" onclick="removeItem(${index})" title="Remove item">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <div class="quantity-control">
+              <button class="qty-btn" onclick="updateQuantity(${index}, -1)">−</button>
+              <span class="qty-value">${item.quantity}</span>
+              <button class="qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = html;
+    }
+
+    // Update quantity
+    function updateQuantity(index, change) {
+      cart[index].quantity += change;
+      if (cart[index].quantity < 1) cart[index].quantity = 1;
+      if (cart[index].quantity > 10) cart[index].quantity = 10;
+      saveCart();
+      renderCart();
+      updateSummary();
+    }
+
+    // Remove item
+    function removeItem(index) {
+      if (confirm('Remove this item from cart?')) {
+        cart.splice(index, 1);
+        saveCart();
+        renderCart();
+        updateSummary();
+      }
+    }
+
+    // Clear all items from cart
+    function clearCart() {
+      if (confirm('Are you sure you want to clear all items from your cart?')) {
+        cart = [];
+        saveCart();
+        renderCart();
+        updateSummary();
+      }
+    }
+
+    // Update summary
+    function updateSummary() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const shipping = cart.length > 0 ? 100 : 0;
+      const discount = subtotal > 5000 ? 500 : 0;
+      const total = subtotal + shipping - discount;
+
+      document.getElementById('itemCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('subtotal').textContent = '₹ ' + subtotal.toLocaleString();
+      document.getElementById('shipping').textContent = '₹ ' + shipping.toLocaleString();
+      document.getElementById('discount').textContent = '- ₹ ' + discount.toLocaleString();
+      document.getElementById('total').textContent = '₹ ' + total.toLocaleString();
+    }
+
+    // Open payment modal
+    function openPaymentModal(fromBuyNow = false) {
+      if (cart.length === 0) return;
+      isBuyNow = fromBuyNow;
+      document.getElementById('paymentModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close payment modal
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+      selectedPaymentMethod = null;
+      isBuyNow = false;
+      document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.querySelector('.fa-check-circle').style.opacity = '0';
+      });
+      document.getElementById('confirmPaymentBtn').disabled = true;
+    }
+
+    // Select payment method
+    function selectPayment(method, element) {
+      selectedPaymentMethod = method;
+      
+      // Remove selection from all options
+      document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.querySelector('.fa-check-circle').style.opacity = '0';
+      });
+      
+      // Add selection to clicked option
+      element.classList.add('selected');
+      element.querySelector('.fa-check-circle').style.opacity = '1';
+      
+      // Enable confirm button
+      document.getElementById('confirmPaymentBtn').disabled = false;
+    }
+
+    // Confirm payment
+    function confirmPayment() {
+      if (!selectedPaymentMethod) return;
+      
+      let displayTotal;
+      if (isBuyNow && cart.length > 0) {
+        const item = cart[cart.length - 1];
+        const subtotal = item.price * item.quantity;
+        const shipping = 100;
+        const discount = subtotal > 5000 ? 500 : 0;
+        displayTotal = '₹ ' + (subtotal + shipping - discount).toLocaleString();
+      } else {
+        displayTotal = document.getElementById('total').textContent;
+      }
+
+      const methodNames = {
+        'esewa': 'eSewa',
+        'khalti': 'Khalti',
+        'bank': 'Bank Transfer'
+      };
+      
+      alert(`🎉 Payment Initiated!\n\nMethod: ${methodNames[selectedPaymentMethod]}\nAmount: ${displayTotal}\n\nRedirecting to payment gateway...`);
+      
+      // Clear cart after successful order
+      setTimeout(() => {
+        if (isBuyNow && cart.length > 0) {
+          cart.pop(); // Remove only the item added via Buy Now
+        } else {
+          cart = []; // Clear all items for regular cart checkout
+        }
+        saveCart();
+        closePaymentModal();
+        renderCart();
+        updateSummary();
+        alert('✅ Order placed successfully!\n\nThank you for shopping with UrbanWave!');
+      }, 1500);
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('paymentModal');
+      if (event.target === modal) {
+        closePaymentModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closePaymentModal();
+      }
+    });
+
+    // Initialize cart on page load
+    loadCart();
+
+    // Check for direct checkout from "Buy Now"
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('checkout') === 'true' && cart.length > 0) {
+      openPaymentModal(urlParams.get('buyNow') === 'true');
+    }
+  </script>
+</body>
+</html>

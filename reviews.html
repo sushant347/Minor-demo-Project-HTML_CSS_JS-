@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Review | UrbanWave</title>
+  <style>
+    :root {
+      --beige-light: #e6dbc8;
+      --beige-dark: #e6dbc8;
+      --text: #333;
+      --accent: #a97c50;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f2eb;
+      color:  #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--beige-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+
+    .nav-left {
+      display: flex;
+      gap:  50px;
+    }
+
+    .nav-left a {
+      text-decoration: none;
+      color: #333;
+      font-weight: normal; /* not bold */
+      font-size: 16px;
+    }
+
+    .nav-left a:hover {
+      color: #a67c52;;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .brand span {
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--text);
+    }
+
+    /* Container */
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #fffdf5;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    /* Reviews Section */
+    .review-box {
+      background:#e6dbc8;
+      border-left: 5px solid var(--accent);
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
+    .review-box strong {
+      color: var(--accent);
+    }
+
+    /* Form */
+    label {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+      font-size: 15px;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 12px 25px;
+      background-color: var(--accent);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #8c6239;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: #e6dbc8;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 50px;
+    }
+    
+    @media (max-width: 768px) {
+      .navbar {
+        flex-wrap: wrap;
+      }
+      .team-members {
+        flex-direction: column;
+        align-items: center;
+      }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="clothes.html">Clothes</a>
+      <a href="footwear.html">Footwear</a>
+      <a href="accessories.html">Accessories</a>
+      <a href="bags.html">Bags</a>
+      <a href="about.html">About Us</a>
+      <a href="info.html">Info</a>
+      <a href="Contact Final.html">Contact</a>
+    </div>
+    <div class="brand">
+      <img src="https://media.githubusercontent.com/media/Sushant-Coder3472/Mini-demo-Project-of-HTML_CSS_JS/main/images/ufo-logo.png" alt="UrbanWave Logo">
+      <span>UrbanWave</span>
+    </div>
+  </div>
+
+  <!-- Customer Review Section -->
+  <div class="container">
+    <h1>Customer Reviews</h1>
+
+    <!-- Example Reviews -->
+    <div class="review-box">
+      <strong>Sarah Neupane</strong> ⭐⭐⭐⭐☆  
+      <p>“The quality of the dresses is amazing! Delivery was super quick too. Will definitely shop again.”</p>
+    </div>
+
+    <div class="review-box">
+      <strong>Sumina Pandey</strong> ⭐⭐⭐⭐⭐  
+      <p>“I ordered a pair of sneakers and they are very comfortable. Excellent service and packaging.”</p>
+    </div>
+
+    <div class="review-box">
+      <strong>Anisha Khatri</strong> ⭐⭐⭐⭐☆  
+      <p>“Loved the variety of casual wear. Prices are reasonable and products are stylish.”</p>
+    </div>
+
+    <!-- Add Review Form -->
+    <form id="reviewForm">
+      <label for="message">Say Something (Write your review):</label>
+      <textarea id="message" placeholder="Type your review here..."></textarea>
+      <button type="submit">Submit Review</button>
+      <div id="feedback"></div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 UrbanWave. All rights reserved. | Privacy Policy | Terms of Service
+  </footer>
+
+  <!-- JavaScript Validation -->
+  <script>
+    const form = document.getElementById('reviewForm');
+    const message = document.getElementById('message');
+    const feedback = document.getElementById('feedback');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // stop page refresh
+      
+      if (message.value.trim() === "") {
+        feedback.textContent = "⚠️ Please write a review before submitting.";
+        feedback.className = "error";
+      } else {
+        feedback.textContent = "✅ Thank you for your review!";
+        feedback.className = "success";
+        message.value = ""; // clear box
+      }
+    });
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
