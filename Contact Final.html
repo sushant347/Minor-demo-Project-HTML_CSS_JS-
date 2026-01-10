@@ -161,6 +161,171 @@
       padding: 15px;
       margin-top: 50px;
     }
+
+    /* ========== MOBILE RESPONSIVE STYLES ========== */
+    
+    @media (max-width: 1024px) {
+      .map-container {
+        flex-direction: column;
+      }
+      
+      .map-container iframe {
+        width: 100%;
+        height: 350px;
+      }
+      
+      .contact-details {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+      }
+      
+      .nav-left {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+      
+      .nav-left a {
+        font-size: 14px;
+      }
+      
+      .brand {
+        order: -1;
+      }
+      
+      .brand span {
+        font-size: 18px;
+      }
+      
+      .contact-section {
+        padding: 15px;
+        margin: 25px auto;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .contact-form {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .contact-form input {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .contact-form button {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .map-container {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .map-container iframe {
+        width: 100%;
+        height: 300px;
+      }
+      
+      .contact-details {
+        max-width: 100%;
+        padding: 20px 15px;
+      }
+      
+      .contact-details p {
+        font-size: 14px;
+      }
+      
+      footer {
+        padding: 12px;
+        margin-top: 30px;
+        font-size: 0.85rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 12px 15px;
+      }
+      
+      .nav-left {
+        gap: 10px;
+      }
+      
+      .nav-left a {
+        font-size: 13px;
+      }
+      
+      .brand img {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .brand span {
+        font-size: 16px;
+      }
+      
+      .contact-section {
+        margin: 20px auto;
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 20px;
+        letter-spacing: 1px;
+      }
+      
+      .underline {
+        width: 40px;
+        margin: 8px auto 20px;
+      }
+      
+      .contact-form input {
+        padding: 10px;
+        width: 100%;
+        font-size: 14px;
+      }
+      
+      .contact-form button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+      
+      .map-container iframe {
+        height: 250px;
+        border-radius: 8px;
+      }
+      
+      .contact-details {
+        padding: 15px;
+        border-radius: 8px;
+      }
+      
+      .contact-details p {
+        font-size: 13px;
+        margin: 8px 0;
+      }
+      
+      .social-icons {
+        margin-top: 12px;
+      }
+      
+      .social-icons a {
+        font-size: 18px;
+        margin-right: 8px;
+      }
+    }
   </style>
 </head>
 <body>

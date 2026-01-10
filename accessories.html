@@ -274,9 +274,151 @@
       50% { transform: scale(1.3); }
     }
 
+    /* ========== MOBILE RESPONSIVE STYLES ========== */
+    
+    @media (max-width: 1024px) {
+      header {
+        padding: 15px 25px;
+      }
+      
+      .navbar {
+        gap: 30px;
+      }
+      
+      .product-grid {
+        padding: 30px;
+        gap: 25px;
+      }
+    }
+
     @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+      }
+      
+      .navbar {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+      
+      .navbar a {
+        font-size: 0.9rem;
+      }
+      
+      .logo {
+        order: -1;
+        font-size: 1.3rem;
+      }
+      
+      .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+      
       .product-card img {
         height: 280px;
+      }
+      
+      .product-details {
+        padding: 12px 15px;
+      }
+      
+      .product-name {
+        font-size: 1rem;
+      }
+      
+      .price {
+        font-size: 0.95rem;
+      }
+      
+      .wishlist {
+        top: 10px;
+        right: 10px;
+        font-size: 1.1rem;
+        padding: 6px;
+      }
+      
+      .sizes span, .colors span {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+      }
+      
+      .actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .cart-btn, .buy-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 15px;
+      }
+      
+      .navbar {
+        gap: 10px;
+      }
+      
+      .navbar a {
+        font-size: 0.85rem;
+      }
+      
+      .logo {
+        font-size: 1.2rem;
+      }
+      
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+      }
+      
+      .product-card {
+        max-width: 100%;
+      }
+      
+      .product-card img {
+        height: 300px;
+      }
+      
+      .product-details {
+        padding: 12px;
+      }
+      
+      .product-name {
+        font-size: 0.95rem;
+      }
+      
+      .price {
+        font-size: 0.9rem;
+      }
+      
+      .discount {
+        font-size: 0.85rem;
+        margin-left: 8px;
+      }
+      
+      .sizes, .colors {
+        font-size: 0.85rem;
+      }
+      
+      .sizes span, .colors span {
+        padding: 3px 6px;
+        font-size: 0.8rem;
+      }
+      
+      .cart-btn, .buy-btn {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        gap: 5px;
       }
     }
   </style>

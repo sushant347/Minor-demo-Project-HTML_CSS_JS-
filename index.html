@@ -551,27 +551,60 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
+    /* ========== MOBILE RESPONSIVE STYLES FOR INDEX.HTML ========== */
+    
+    /* Tablet (max-width: 1024px) */
+    @media (max-width: 1024px) {
+      .modal-content {
+        width: 95%;
+        max-width: 900px;
+      }
+      
+      .modal-left {
+        min-height: 400px;
+      }
+      
+      .modal-product-image {
+        max-height: 380px;
+      }
+      
+      .search-container.active #search-form {
+        width: 220px;
+      }
+    }
+
     @media (max-width: 768px) {
       .modal-content {
         flex-direction: column;
         width: 95%;
         max-width: 100%;
+        margin: 10px;
+        max-height: 95vh;
+        overflow-y: auto;
       }
 
       .modal-left {
-        min-height: 300px;
+        min-height: 250px;
+        padding: 20px;
       }
 
       .modal-product-image {
-        max-height: 300px;
+        max-height: 250px;
       }
 
       .modal-right {
-        padding: 30px 20px;
+        padding: 25px 20px;
+        max-height: none;
       }
 
       .action-buttons {
         flex-direction: column;
+        gap: 10px;
+      }
+      
+      .add-cart-btn, .buy-now-btn {
+        padding: 14px;
+        font-size: 0.95rem;
       }
 
       .modal-title {
@@ -580,6 +613,162 @@
 
       .modal-price {
         font-size: 1.8rem;
+      }
+      
+      .modal-close-btn {
+        top: 10px;
+        right: 10px;
+        width: 38px;
+        height: 38px;
+        font-size: 1.5rem;
+      }
+      
+      .size-options, .color-options {
+        gap: 8px;
+      }
+      
+      .size-btn, .color-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      
+      .quantity-selector {
+        justify-content: center;
+      }
+      
+      .qty-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+      
+      .original-price {
+        font-size: 1.1rem;
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+      }
+      
+      .discount-badge {
+        margin-left: 0;
+        margin-top: 8px;
+        display: inline-block;
+      }
+      
+      .search-container.active #search-form {
+        width: 200px;
+      }
+      
+      #search-input {
+        height: 36px;
+        font-size: 0.9rem;
+      }
+      
+      .suggestions-box {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      
+      .suggestion-item {
+        padding: 10px 15px;
+        gap: 12px;
+      }
+      
+      .suggestion-item img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+    
+    /* Mobile Portrait (max-width: 480px) */
+    @media (max-width: 480px) {
+      .product-modal.active {
+        padding: 10px;
+      }
+      
+      .modal-content {
+        border-radius: 12px;
+        margin: 5px;
+      }
+      
+      .modal-left {
+        min-height: 200px;
+        padding: 15px;
+      }
+      
+      .modal-product-image {
+        max-height: 200px;
+      }
+      
+      .modal-right {
+        padding: 20px 15px;
+      }
+      
+      .modal-title {
+        font-size: 1.3rem;
+      }
+      
+      .modal-price {
+        font-size: 1.5rem;
+      }
+      
+      .section-title {
+        font-size: 1rem;
+      }
+      
+      .description {
+        font-size: 0.9rem;
+      }
+      
+      .features-list li {
+        font-size: 0.9rem;
+        padding: 8px 0;
+        padding-left: 25px;
+      }
+      
+      .size-btn, .color-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+      }
+      
+      .qty-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+      }
+      
+      .qty-display {
+        font-size: 1.1rem;
+      }
+      
+      .add-cart-btn, .buy-now-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+      
+      .search-container.active #search-form {
+        width: 160px;
+      }
+      
+      #search-input {
+        height: 34px;
+        font-size: 0.85rem;
+        padding: 0 12px !important;
+      }
+      
+      .suggestion-item {
+        padding: 8px 12px;
+        gap: 10px;
+      }
+      
+      .suggestion-item img {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .stock-status {
+        padding: 6px 14px;
+        font-size: 0.85rem;
       }
     }
   </style>

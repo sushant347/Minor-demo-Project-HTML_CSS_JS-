@@ -130,13 +130,145 @@
       margin-top: 50px;
     }
 
+    /* ========== MOBILE RESPONSIVE STYLES ========== */
+    
     @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+      }
+      
       .navbar {
         flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
       }
+      
+      .navbar a {
+        font-size: 0.9rem;
+      }
+      
+      .branding {
+        order: -1;
+      }
+      
+      .branding span {
+        font-size: 1.3rem;
+      }
+      
+      .about-section {
+        margin: 30px 15px;
+        padding: 25px 20px;
+      }
+      
+      .about-section h1 {
+        font-size: 1.5rem;
+      }
+      
+      .about-section p {
+        font-size: 0.95rem;
+      }
+      
+      .team-section {
+        padding: 15px 20px;
+        margin: 20px 15px;
+      }
+      
+      .team-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+      }
+      
       .team-members {
         flex-direction: column;
         align-items: center;
+        gap: 20px;
+      }
+      
+      .member {
+        width: 90%;
+        max-width: 280px;
+        padding: 20px 15px;
+      }
+      
+      .member img {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .member h3 {
+        font-size: 1.1rem;
+      }
+      
+      .member p {
+        font-size: 0.85rem;
+      }
+      
+      footer {
+        padding: 15px;
+        font-size: 0.85rem;
+        margin-top: 30px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 15px;
+      }
+      
+      .navbar {
+        gap: 10px;
+      }
+      
+      .navbar a {
+        font-size: 0.85rem;
+      }
+      
+      .branding img {
+        height: 35px;
+      }
+      
+      .branding span {
+        font-size: 1.2rem;
+      }
+      
+      .about-section {
+        margin: 20px 10px;
+        padding: 20px 15px;
+      }
+      
+      .about-section h1 {
+        font-size: 1.3rem;
+      }
+      
+      .about-section p {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+      }
+      
+      .team-section {
+        padding: 10px 15px;
+      }
+      
+      .team-section h2 {
+        font-size: 1.2rem;
+      }
+      
+      .member {
+        width: 100%;
+        max-width: 260px;
+        padding: 15px;
+      }
+      
+      .member img {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 10px;
+      }
+      
+      .member h3 {
+        font-size: 1rem;
       }
     }
   </style>
