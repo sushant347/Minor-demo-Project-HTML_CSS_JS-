@@ -75,7 +75,7 @@ body {
 }
 
 .logo {
-  height: 190px !important;  /* increased logo size with !important to override any other styles */
+  height: 170px !important;  /* reduced slightly to improve header proportions */
   width: auto;
   display: block;
   margin: -20px 0; /* negative margin to prevent navbar from being too tall */

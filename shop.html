@@ -88,11 +88,17 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      position: relative;
     }
 
     .navbar {
       display: flex;
       gap: 50px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
     }
 
     .navbar a {
