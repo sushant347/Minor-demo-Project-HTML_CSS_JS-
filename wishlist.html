@@ -7,10 +7,27 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     body { font-family: Arial, sans-serif; background-color: #f5f2eb; color: #333; margin: 0; }
-    header { background-color: #e6dbc8; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.8rem; font-weight: bold; color: #a67c52; text-decoration: none; }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { text-decoration: none; color: #333; font-weight: 500; }
+    header { 
+      background-color: #e6dbc8; 
+      padding: 15px 40px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      position: relative;
+      flex-wrap: wrap;
+    }
+    .logo { font-size: 1.5rem; font-weight: normal; color: #a67c52; text-decoration: none; }
+    .nav-links { 
+      display: flex; 
+      gap: 30px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+    .nav-links a { text-decoration: none; color: #333; font-weight: normal; font-size: 1rem; transition: color 0.3s; }
+    .nav-links a:hover { color: #a67c52; }
     .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
     .page-title { text-align: center; margin-bottom: 30px; }
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
@@ -205,22 +222,23 @@
   </style>
 </head>
 <body>
-  <header>
-    <a href="index.html" class="logo">UrbanWave</a>
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="clothes.html">Clothes</a>
-      <a href="footwear.html">Footwear</a>
-      <a href="accessories.html">Accessories</a>
-      <a href="bags.html">Bags</a>
-      <a href="about.html">About Us</a>
-      <a href="info.html">Info</a>
-      <a href="Contact Final.html">Contact</a>
-      <a href="cart.html">Cart</a>
-    </nav>
-  </header>
-
   <div id="toast-notification" class="toast-notification"></div>
+
+  <!-- Header with Navigation -->
+  <header>
+    <div class="navbar" style="display: flex; gap: 30px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); white-space: nowrap;">
+      <a href="index.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Home</a>
+      <a href="clothes.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Clothes</a>
+      <a href="footwear.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Footwear</a>
+      <a href="accessories.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Accessories</a>
+      <a href="bags.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Bags</a>
+      <a href="about.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">About Us</a>
+      <a href="info.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Info</a>
+      <a href="Contact Final.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Contact</a>
+      <a href="cart.html" style="text-decoration: none; color: #333; font-weight: normal; font-size: 1rem;">Cart</a>
+    </div>
+    <div class="logo">UrbanWave</div>
+  </header>
 
   <div class="container">
     <h1 class="page-title">My Wishlist</h1>
